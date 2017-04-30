@@ -14,7 +14,14 @@ import logging
 
 
 app = Flask(__name__)
+ask = Ask(app, '/summarizer')
 
+logging.getLogger("flask_ask").setLevel(logging.DEBUG)
+
+
+@app.route('/')
+def homepage():
+    return  'hello world!'
 
 
 
