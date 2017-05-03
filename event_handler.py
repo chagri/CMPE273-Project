@@ -3,6 +3,7 @@ import os
 from slackclient import SlackClient
 import spacy
 from nltk import Tree
+from file_reader import *
 import MySQLdb
 
 nlp = spacy.load('en')
@@ -106,6 +107,7 @@ def process_command(command):
 
 if __name__ == "__main__":
     print "Trying to connect"
+    createDictionary()
     
     READ_WEBSOCKET_DELAY = 1 # 1 second delay between reading from firehose
     if slack_client.rtm_connect():
