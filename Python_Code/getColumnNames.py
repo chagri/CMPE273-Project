@@ -7,7 +7,7 @@ import MySQLdb
 def getAllColumns(table):   
     allColumns = set()
     #global allColumns
-    db = MySQLdb.connect("localhost","root","Apple@123","testdb" )
+    db = MySQLdb.connect("localhost","root","****","testdb" )
     cursor = db.cursor()
     sql = """ SHOW COLUMNS FROM %s """ %table
     cursor.execute(sql)
