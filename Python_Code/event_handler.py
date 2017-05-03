@@ -2,7 +2,7 @@ import time
 import os
 from slackclient import SlackClient
 from file_reader import *
-from nlp_parser import process_command,dependecyParse
+from nlp_parser import *
 import MySQLdb
 
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
@@ -14,8 +14,8 @@ cursor = db.cursor()
 
 def handle_command(command, channel):
     #call to nlp module
-    response = process_command(command)
-    dependecyParse(command)
+    response = ''
+    nlp_parseInput(command)
     slack_client.api_call("chat.postMessage", channel=channel,
                           text=response, as_user=True)
     
