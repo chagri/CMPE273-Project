@@ -10,29 +10,37 @@ nlp = spacy.load('en')
 
 def nlp_parseInput(command):
     global CMD
+    print "5", command
     CMD = command 
     parsedEx = nlp(command.decode('utf-8'))
     tokens = lemmatizeTokens(parsedEx)
-    removeStopWords(tokens)
+    print "6",tokens
+    return removeStopWords(tokens)
 
 def removeStopWords(tokens):
+    print "7"
     global FROM_token,CMD
     STOPLIST = set(stopwords.words('english'))
     #customize stopwords to add/remove words
+    print "8",STOPLIST
     QUE_LIST = ['what','when','who','where','how']
     STOPLIST = [q for q in STOPLIST if q not in QUE_LIST]
     STOPLIST.append('?')
+    print "tokens", tokens
     tokens_filtered = [tok for tok in tokens if tok not in STOPLIST]
+    print "9",tokens_filtered
     FROM_token = findTableorCol(tokens_filtered,"table")
+    print "15",FROM_token
     #if no table found, do not search for cols
     if(FROM_token != None):
         cols = findTableorCol(tokens_filtered,"columns")
+        print "cols ", cols
         if(len(cols) == 0):
             cols.append("*")
     #new sentence without stop words
     #new_sentence = ' '.join(tokens_filtered)
     print FROM_token,cols
-    dependecyParse(CMD)
+    return dependecyParse(CMD)
 
 def lemmatizeTokens(tokens):
     lemmas = []
@@ -44,10 +52,14 @@ def lemmatizeTokens(tokens):
 #call file_reader module to find tablename & column name
 def findTableorCol(tokens_filtered,key):
     global cols
+    print "11"
     if(key == "table"):
         for t in tokens_filtered:
+            print "tableDict", tableDict
+            print "tokens_filtered", tokens_filtered
             table_name = searchDictionary(tableDict,str(t))
             #read columns only when we know the table
+            print "table_name",table_name
             if(table_name != None):
                 FROM_token = table_name.strip("['']")
                 readFromFile(FROM_token,"columns")
@@ -80,9 +92,10 @@ def dependecyParse(command):
         leaf= str(token.orth_.encode('utf-8'))
         head=str(token.head.orth_.encode('utf-8'))
         #call generateQuery module
-        generateQuery(FROM_token,cols,leaf,head)
-        #print leaf, head
-   
+        output = generateQuery(FROM_token,cols,leaf,head)
+        if output:
+            return output                
+        
 #method to find nouns, verbs ..
 def process_command(command):
     #command = "who is the professor for CMPE273 for spring 2017?"
@@ -112,4 +125,3 @@ def process_command(command):
         #response = "I am CMPE bot. How can I help you? Use the *" + EXAMPLE_COMMAND + \
                       #"* command while asking questions."
     return response
-
