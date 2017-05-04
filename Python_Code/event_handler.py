@@ -3,7 +3,6 @@ import os
 from slackclient import SlackClient
 from file_reader import *
 from nlp_parser import *
-import MySQLdb
 
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
 BOT_ID = os.environ.get("BOT_ID")
@@ -29,25 +28,13 @@ def parse_slack_output(slack_rtm_output):
                        output['channel']
     return None, None
 
-#Generate query 
-def generateQuery(leaf,head):
-    data=None
-    print leaf
-    print head    
-    print leaf
-    cursor.execute("SELECT Week, Topics from testdb.CourseSchedule where Topics like ('%s%s');"%("%"+leaf+"%","%"+head+"%"))           
-    data = cursor.fetchall()
-    print "fetch completed",data,"data"  
-    if data:      
-        print "Output : %s " % data         
-    return data
-
 if __name__ == "__main__":
-    print "Trying to connect"
-    createDictionary()    
+    print "Trying to connect"     
     READ_WEBSOCKET_DELAY = 1 # 1 second delay between reading from firehose
     if slack_client.rtm_connect():
         print "StarterBot connected and running!"
+        #load 'table' dictionary
+        createDictionary()  
         while True:
             command, channel = parse_slack_output(slack_client.rtm_read())
             if command and channel:
