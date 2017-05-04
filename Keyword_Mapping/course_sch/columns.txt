@@ -1,0 +1,3 @@
+date;week,week1,week2,when
+dues;assignment,lab
+topics;subject,chapter

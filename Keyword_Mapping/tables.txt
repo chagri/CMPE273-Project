@@ -1,0 +1,3 @@
+greensheet;professor,instructor,email,prereq,prerequisites,who
+course_sch;when,topic,chapter,lecture,due,duedate
+grading_policy;grade,lab,assignment,quiz

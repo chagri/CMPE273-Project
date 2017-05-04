@@ -1,0 +1,4 @@
+instructor;professsor
+office_location;room,office,location
+email;mail,email
+office_hours;
