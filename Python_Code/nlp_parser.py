@@ -9,32 +9,24 @@ CMD = ''
 nlp = spacy.load('en')
 
 def nlp_parseInput(command):
-    global CMD
-    print "5", command
+    global CMD    
     CMD = command 
     parsedEx = nlp(command.decode('utf-8'))
-    tokens = lemmatizeTokens(parsedEx)
-    print "6",tokens
+    tokens = lemmatizeTokens(parsedEx)    
     return removeStopWords(tokens)
 
 def removeStopWords(tokens):
-    print "7"
     global FROM_token,CMD
     STOPLIST = set(stopwords.words('english'))
-    #customize stopwords to add/remove words
-    print "8",STOPLIST
+    #customize stopwords to add/remove words    
     QUE_LIST = ['what','when','who','where','how']
     STOPLIST = [q for q in STOPLIST if q not in QUE_LIST]
     STOPLIST.append('?')
-    print "tokens", tokens
-    tokens_filtered = [tok for tok in tokens if tok not in STOPLIST]
-    print "9",tokens_filtered
-    FROM_token = findTableorCol(tokens_filtered,"table")
-    print "15",FROM_token
+    tokens_filtered = [tok for tok in tokens if tok not in STOPLIST]    
+    FROM_token = findTableorCol(tokens_filtered,"table")    
     #if no table found, do not search for cols
     if(FROM_token != None):
-        cols = findTableorCol(tokens_filtered,"columns")
-        print "cols ", cols
+        cols = findTableorCol(tokens_filtered,"columns")        
         if(len(cols) == 0):
             cols.append("*")
     #new sentence without stop words
@@ -51,15 +43,11 @@ def lemmatizeTokens(tokens):
 
 #call file_reader module to find tablename & column name
 def findTableorCol(tokens_filtered,key):
-    global cols
-    print "11"
+    global cols    
     if(key == "table"):
         for t in tokens_filtered:
-            print "tableDict", tableDict
-            print "tokens_filtered", tokens_filtered
             table_name = searchDictionary(tableDict,str(t))
-            #read columns only when we know the table
-            print "table_name",table_name
+            #read columns only when we know the table            
             if(table_name != None):
                 FROM_token = table_name.strip("['']")
                 readFromFile(FROM_token,"columns")
