@@ -1,14 +1,16 @@
 import time
 import os
 import MySQLdb
-
+from getColumnNames import *
 
 #Generate query 
-def generateQuery(fromTable,selectColumns,whereColumns,leaf,head):
-    db = MySQLdb.connect("localhost","root","****","testdb" )
+def generateQuery(fromTable,selectColumns,leaf,head):
+    allColumns = getAllColumns(fromTable)
+    selectColumns=set(selectColumns)       
+    whereColumns=eliminateSelectColumns(selectColumns,allColumns)    
+    db = MySQLdb.connect("localhost","root","Apple@123","testdb" )
     cursor = db.cursor()
-    data=None   
-    print selectColumns
+    data=None       
     selectString=None
     print(len(selectColumns))
     if len(selectColumns)>1:
@@ -17,7 +19,7 @@ def generateQuery(fromTable,selectColumns,whereColumns,leaf,head):
     else:
         selectString= ','.join(str(s) for s in selectColumns)    
         
-    print selectString
+    print "selectString",selectString
     for column in set(whereColumns):
         print column
         cursor.execute("SELECT %s from %s where %s like ('%s%s');"%(selectString,fromTable,column,"%"+leaf+"%","%"+head+"%"))                   
@@ -28,18 +30,18 @@ def generateQuery(fromTable,selectColumns,whereColumns,leaf,head):
         if data:      
             print "Output : %s " % data 
             return data    
-    
+    return None
 
 #sample input
-selectColumns=set()
-selectColumns.add("Week")  
-selectColumns.add("Dues")  
-fromTable="CourseSchedule"
-leaf="final"
-head="exam"  
-whereColumns=set()
-whereColumns.add("topics")    
-generateQuery(fromTable,selectColumns,whereColumns,leaf,head)
+#selectColumns=set()
+#selectColumns.add("Week")  
+##selectColumns.add("Dues")  
+#fromTable="CourseSchedule"
+#leaf="final"
+#head="exam"  
+#whereColumns=set()
+#whereColumns.add("topics")    
+#generateQuery(fromTable,selectColumns,whereColumns,leaf,head)
 
 
 
