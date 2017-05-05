@@ -74,16 +74,25 @@ def dependecyParse(command):
     #print command
     print "---dependency tree----"
     [to_nltk_tree(sent.root).pretty_print() for sent in parseDep.sents] 
-    for token in parseDep:            
+    for token in parseDep: 
+        print "token",token           
         #print(token.orth_.encode('utf-8'), token.dep_.encode('utf-8'), token.head.orth_.encode('utf-8'), [t.orth_.encode('utf-8') for t in token.lefts], [t.orth_.encode('utf-8') for t in token.rights])                
         #print token.orth_.encode('utf-8'),token.head.orth_.encode('utf-8')      
         leaf= str(token.orth_.encode('utf-8'))
         head=str(token.head.orth_.encode('utf-8'))
         #call generateQuery module
-        output = generateQuery(FROM_token,cols,leaf,head)
+        searchCondition = "%"+leaf+"%""%"+head+"%"
+        output = generateQuery(FROM_token,cols,searchCondition)
         if output:
-            return output                
-        
+            return output                                
+
+    for token in parseDep: 
+        print "token",token   
+        token= "%"+str(token)+"%"
+        output = generateQuery(FROM_token,cols,token)
+        if output:
+            return output 
+
 #method to find nouns, verbs ..
 def process_command(command):
     #command = "who is the professor for CMPE273 for spring 2017?"
