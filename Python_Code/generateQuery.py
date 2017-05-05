@@ -23,11 +23,12 @@ def generateQuery(fromTable,selectColumns,searchCondition):
     for column in set(whereColumns):
         print column
         print "searchCondition", searchCondition
-        cursor.execute("SELECT %s from %s where %s like ('%s');"%(selectString,fromTable,column,searchCondition))                   
+        rows_affected = cursor.execute("SELECT %s from %s where %s like ('%s');"%(selectString,fromTable,column,searchCondition))                   
         data = cursor.fetchall()
-        print data
-        data='\n'.join(','.join(elems) for elems in data)                
-        print "fetch completed",data,"data"
+        if rows_affected >1:                                  
+            cursor.execute("SELECT %s,%s from %s where %s like ('%s');"%(column,selectString,fromTable,column,searchCondition))                           
+            data = cursor.fetchall()
+        data='\n'.join(','.join(elems) for elems in data)                        
         if data:      
             print "Output : %s " % data 
             return data    
