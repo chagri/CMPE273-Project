@@ -10,7 +10,7 @@ BOT_ID = "U51MTV4MQ"
 
 AT_BOT = "<@" + BOT_ID + ">"
 attr = "hello"
-slack_client = SlackClient('xoxb-171741990738-4R1j6UxgUdfb6EDjGypgKAAL')
+slack_client = SlackClient('xoxb-171741990738-6d4wapXIG1pjTS9mfUC8ZWrm')
 
 def handle_command(command, channel):
 
