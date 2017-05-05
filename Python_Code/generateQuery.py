@@ -4,15 +4,15 @@ import MySQLdb
 from getColumnNames import *
 
 #Generate query 
-def generateQuery(fromTable,selectColumns,leaf,head):
+def generateQuery(fromTable,selectColumns,searchCondition):
+
     allColumns = getAllColumns(fromTable)
-    selectColumns=set(selectColumns)       
-    whereColumns=eliminateSelectColumns(selectColumns,allColumns)    
+    selectColumns = set(selectColumns)       
+    whereColumns = eliminateSelectColumns(selectColumns,allColumns)       
     db = MySQLdb.connect("localhost","root","Apple@123","testdb" )
     cursor = db.cursor()
     data=None       
-    selectString=None
-    print(len(selectColumns))
+    selectString=None    
     if len(selectColumns)>1:
         selectString = ', '.join(str(e) for e in selectColumns) 
         
@@ -22,7 +22,8 @@ def generateQuery(fromTable,selectColumns,leaf,head):
     print "selectString",selectString
     for column in set(whereColumns):
         print column
-        cursor.execute("SELECT %s from %s where %s like ('%s%s');"%(selectString,fromTable,column,"%"+leaf+"%","%"+head+"%"))                   
+        print "searchCondition", searchCondition
+        cursor.execute("SELECT %s from %s where %s like ('%s');"%(selectString,fromTable,column,searchCondition))                   
         data = cursor.fetchall()
         print data
         data='\n'.join(','.join(elems) for elems in data)                
