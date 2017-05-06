@@ -22,7 +22,7 @@ def generateQuery(fromTable,selectColumns,searchCondition,subjectcode, sectionna
     else:
         selectString= ','.join(str(s) for s in selectColumns)    
             
-    for column in set(whereColumns):                        
+    for column in set(whereColumns):                                
         rows_affected = cursor.execute("SELECT %s from %s where %s like ('%s') and subject_code=trim('%s') and section_name=trim('%s') and section_period=trim('%s');"%(selectString,fromTable,column,searchCondition,subjectcode, sectionname,sectionperiod))                   
         data = cursor.fetchall()        
         if rows_affected >1:                                  
@@ -31,7 +31,12 @@ def generateQuery(fromTable,selectColumns,searchCondition,subjectcode, sectionna
                   
         data='\n'.join(''.join(str(elems)) for elems in data)    
         data = data.replace("'","").replace('(', '').replace(')', '').replace('datetime.date', '')
-        if data:      
+
+        if data:    
+            print "column",column  
+            if  "date" in selectColumns:
+                data=data.replace(',','-')
+                data=data.rstrip('-')
             print "Output : %s " % data 
             return data
     return None
