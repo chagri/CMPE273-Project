@@ -1,20 +1,17 @@
-import time
-import os
-from slackclient import SlackClient
-from file_reader import *
-from nlp_parser import *
+import spacy
 from SpellCheck import SpellCheckResponse
 import MySQLdb
 import enchant
 
-d = enchant.Dict("en_US")
 
+d = enchant.Dict("en_US")
+nlp = spacy.load('en')
 def DB_Response(command):
     doc1 = nlp(command.decode("utf-8"))
     db = MySQLdb.connect(host="127.0.0.1",  # your host, usually localhost
-                         user="root",  # your username
+                         user="greensheet",  # your username
                          passwd="root1234",  # your password
-                         db="test")  # name of the data base
+                         db="slackbot")  # name of the data base
 
     cur = db.cursor()
     i = 0
@@ -23,36 +20,39 @@ def DB_Response(command):
     responseAttributes = []
 
 
-    attr = "hello"
-    if attr in command:
-        response = 'hey there, Try asking me something from your greesheet For Example: cmpe273 section2 spring,2017, who is the instructor?'
-        return response
-
-
     for word in doc1:
             if word.pos_ == "NOUN":
-                if i <2:
+                if i <3:
+                    print "input mainAtrr"
                     mainAttributes.append(word)
-                    flag = 1
+
+
                 elif i > 2:
+                    print "Input response Att"
                     responseAttributes.append(word)
-                i = i + 1;
+                i = i + 1
+            if i > 2:
+                flag =1
+            else:
+                flag = 0
+
+
     for word in responseAttributes:
+           print  "Checking spell check response"
            if SpellCheckResponse(word) == False:
+            print "found an spelling error"
             return "Hey I see There Is someting wrong with the Spelling you provided. Do you mean" +  str(d.suggest(word)) + "  instead of "+ str(word)
 
 
     if flag == 1:
-
-        # Use all the SQL you like
-
-        query = "SELECT instructor FROM greensheet1  where subject_code=" + "'" + str(mainAttributes[
-                                                                                          0]) + "' and section_name =" + "'" + str(
-            mainAttributes[1]) + "' and section_period=" + "'" + str(mainAttributes[2]) + "';"
-
+        print "Finally got every thing All right"
+        query = "SELECT instructor FROM greensheet1  where subject_code=" + "'" + str(mainAttributes[0]) + "' and section_name =" + "'" + str(mainAttributes[1]) + "' and section_period=" + "'" + str(mainAttributes[2]) + "';"
 
         cur.execute(query)
         response = cur.fetchall()
         return response
-
+    else:
+        print "Test from Hello"
+        response = 'hey there, Try asking me something from your greesheet For Example: cmpe273 section2 spring,2017, who is the instructor?'
+        return response
 
