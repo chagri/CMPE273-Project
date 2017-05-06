@@ -13,17 +13,18 @@ sectionname = ''
 sectionperiod = ''
 
 def nlp_parseInput(command):
+  try:  
     global CMD ,subjectcode ,sectionname, sectionperiod
     print "command ",command     
 
-    GREETLIST = ['hi','hello','hey','hi there','hey there'] 
+    GREETLIST = ['hi','hello','hey','hi there','hey there','wassup','whatssup'] 
     if command in GREETLIST:
         response = "hello, try asking something from greesheet. For Example: cmpe273 section2 spring2017, who is the instructor?"
         return response    
               
-    if len(command.strip().split()) == 1:
+    if len(command.strip().split()) <= 1:
         return None
-        
+
     primaryKey = command.split(' ')
     subjectcode = primaryKey[0]
     sectionname = primaryKey[1]
@@ -38,6 +39,9 @@ def nlp_parseInput(command):
 
     tokens = lemmatizeTokens(parsedEx)    
     return removeStopWords(tokens)
+    
+  except:
+    return None
 
 def removeStopWords(tokens):
     global FROM_token,CMD
