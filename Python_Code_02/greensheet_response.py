@@ -2,6 +2,7 @@ import spacy
 from SpellCheck import SpellCheckResponse
 import MySQLdb
 import enchant
+from checkGreensheetAttribute import checkSubjectCode
 
 
 d = enchant.Dict("en_US")
@@ -35,6 +36,9 @@ def DB_Response(command):
                 flag =1
             else:
                 flag = 0
+    checkGreensheet =  checkSubjectCode(mainAttributes)
+    if checkGreensheet == False:
+        return "Hello There I cannot find the GreenSheet you are seeking for try seaching for someother GreenSheet."
 
 
     for word in responseAttributes:
@@ -56,3 +60,4 @@ def DB_Response(command):
         response = 'hey there, Try asking me something from your greesheet For Example: cmpe273 section2 spring,2017, who is the instructor?'
         return response
 
+    db.close()
