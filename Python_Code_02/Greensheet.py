@@ -1,7 +1,5 @@
 import time
-import os
 from slackclient import SlackClient
-from file_reader import *
 import greensheet_response
 
 import MySQLdb
@@ -10,7 +8,7 @@ BOT_ID = "U51MTV4MQ"
 
 AT_BOT = "<@" + BOT_ID + ">"
 attr = "hello"
-slack_client = SlackClient('xoxb-171741990738-6d4wapXIG1pjTS9mfUC8ZWrm')
+slack_client = SlackClient('**********')
 
 def handle_command(command, channel):
 
@@ -55,4 +53,3 @@ if __name__ == "__main__":
             time.sleep(READ_WEBSOCKET_DELAY)
     else:
         print("Connection failed. Invalid Slack token or bot ID?")
-
