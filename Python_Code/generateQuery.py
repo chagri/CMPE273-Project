@@ -56,13 +56,9 @@ def generateQueryTwo(fromTable,selectColumns,subjectcode, sectionname,sectionper
         selectString= ','.join(str(s) for s in selectColumns)                      
     rows_affected = cursor.execute("SELECT %s from %s where subject_code=trim('%s') and section_name=trim('%s') and section_period=trim('%s');"%(selectString,fromTable,subjectcode, sectionname,sectionperiod))                   
     data = cursor.fetchall()        
-    if rows_affected >1:                                  
-         cursor.execute("SELECT %s,%s from %s where subject_code=trim('%s') and section_name=trim('%s') and section_period=trim('%s');"%(column,selectString,fromTable,subjectcode,sectionname,sectionperiod))                           
-         data = cursor.fetchall()
-                  
     data='\n'.join(''.join(str(elems)) for elems in data)    
     data = data.replace("'","").replace('(', '').replace(')', '').replace('datetime.date', '')
-          
+    print "data",data      
     if data:                 
         if  "date" in selectColumns:
                 data=data.replace(',','-')
