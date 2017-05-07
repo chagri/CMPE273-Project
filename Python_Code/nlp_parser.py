@@ -4,6 +4,11 @@ from nltk import Tree
 from nltk.corpus import stopwords
 from file_reader import *
 from generateQuery import *
+from datetime import datetime
+import parsedatetime as pdt # $ pip install parsedatetime
+
+cal = pdt.Calendar()
+
 FROM_token = ''
 cols = list()
 CMD = ''
@@ -15,8 +20,15 @@ sectionperiod = ''
 def nlp_parseInput(command):
     
  try:  
-    global CMD ,subjectcode ,sectionname, sectionperiod
+    global CMD ,subjectcode ,sectionname, sectionperiod, dateValue
     print "************command ",command     
+    
+    dateChk = command.encode('ascii','ignore')    
+    dateValue = ''
+    if (str(cal.parseDT(dateChk)[0]) != datetime.now().strftime('%Y-%m-%d %H:%M:%S')):         
+        dateValue=str(cal.parseDT(dateChk)[0].date())        
+
+    print dateValue 
 
     GREETLIST = ['hi','hello','hey','hi there','hey there','wassup','whatssup'] 
     if command in GREETLIST:
@@ -172,15 +184,19 @@ def findLeafHead(command,key):
         return leafList
 #find dependency between words
 def dependecyParse(command):
+    global dateValue
     parseDep = nlp(command.decode('utf-8'))
     list1 = set()
     list1.add('who')
     list2 = set()
 
-    #print command
+    print FROM_token
     print "---dependency tree----"
     [to_nltk_tree(sent.root).pretty_print() for sent in parseDep.sents] 
     if FROM_token and '*' not in cols:
+        if dateValue:            
+            output = generateQueryOne(FROM_token,cols,dateValue,subjectcode, sectionname,sectionperiod)   
+            return output
         for token in parseDep:  
             list2.add(token)               
             #print(token.orth_.encode('utf-8'), token.dep_.encode('utf-8'), token.head.orth_.encode('utf-8'), [t.orth_.encode('utf-8') for t in token.lefts], [t.orth_.encode('utf-8') for t in token.rights])                
