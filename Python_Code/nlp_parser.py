@@ -15,11 +15,11 @@ sectionperiod = ''
 def nlp_parseInput(command):
   try:  
     global CMD ,subjectcode ,sectionname, sectionperiod
-    print "command ",command     
+    print "************command ",command     
 
     GREETLIST = ['hi','hello','hey','hi there','hey there','wassup','whatssup'] 
     if command in GREETLIST:
-        response = "hello, try asking something from greesheet. For Example: cmpe273 section2 spring2017, who is the instructor?"
+        response = "hello, try asking something from greesheet. For Example: cmpe273 section2 spring2017 who is the instructor?"
         return response    
               
     if len(command.strip().split()) <= 1:
@@ -44,13 +44,15 @@ def nlp_parseInput(command):
     return None
 
 def removeStopWords(tokens):
-    global FROM_token,CMD
+    global FROM_token,CMD, cols
+    cols = list()
     STOPLIST = set(stopwords.words('english'))
     #customize stopwords to add/remove words    
     QUE_LIST = ['what','when','who','where','how']
     STOPLIST = [q for q in STOPLIST if q not in QUE_LIST]
     STOPLIST.append('?')
     tokens_filtered = [tok for tok in tokens if tok not in STOPLIST]    
+    print "tokens_filtered",tokens_filtered
     FROM_token = findTableorCol(tokens_filtered,"table")    
     #if no table found, do not search for cols
     if(FROM_token != None):
@@ -71,7 +73,8 @@ def lemmatizeTokens(tokens):
 
 #call file_reader module to find tablename & column name
 def findTableorCol(tokens_filtered,key):
-    global cols    
+    global cols      
+    FROM_token=''  
     if(key == "table"):
         for t in tokens_filtered:
             table_name = searchDictionary(tableDict,str(t))
@@ -99,27 +102,38 @@ def to_nltk_tree(node):
 #find dependency between words
 def dependecyParse(command):
     parseDep = nlp(command.decode('utf-8'))
+    list1 = set()
+    list1.add('who')
+    list2 = set()
+
     #print command
     print "---dependency tree----"
     [to_nltk_tree(sent.root).pretty_print() for sent in parseDep.sents] 
-    for token in parseDep:                 
-        #print(token.orth_.encode('utf-8'), token.dep_.encode('utf-8'), token.head.orth_.encode('utf-8'), [t.orth_.encode('utf-8') for t in token.lefts], [t.orth_.encode('utf-8') for t in token.rights])                
-        #print token.orth_.encode('utf-8'),token.head.orth_.encode('utf-8')      
-        leaf= str(token.orth_.encode('utf-8'))
-        head=str(token.head.orth_.encode('utf-8'))
-        #call generateQuery module
-        searchCondition = "%"+leaf+"%""%"+head+"%"
-        if FROM_token:            
-            output = generateQuery(FROM_token,cols,searchCondition,subjectcode, sectionname,sectionperiod )
+    if FROM_token and '*' not in cols:
+        for token in parseDep:  
+            list2.add(token)               
+            #print(token.orth_.encode('utf-8'), token.dep_.encode('utf-8'), token.head.orth_.encode('utf-8'), [t.orth_.encode('utf-8') for t in token.lefts], [t.orth_.encode('utf-8') for t in token.rights])                
+            #print token.orth_.encode('utf-8'),token.head.orth_.encode('utf-8')      
+            leaf= str(token.orth_.encode('utf-8'))
+            head=str(token.head.orth_.encode('utf-8'))
+            #call generateQuery module
+            searchCondition = "%"+leaf+"%""%"+head+"%"                        
+            output = generateQueryOne(FROM_token,cols,searchCondition,subjectcode, sectionname,sectionperiod )
             if output:
-                return output                                
-
-    for token in parseDep:                 
-        token= "%"+str(token)+"%"
-        if FROM_token:
-            output = generateQuery(FROM_token,cols,token,subjectcode, sectionname,sectionperiod)
+                    return output                                
+            searchCondition = "%"+head+"%""%"+leaf+"%"        
+            output = generateQueryOne(FROM_token,cols,searchCondition,subjectcode, sectionname,sectionperiod )
             if output:
-                return output 
+                    return output
+        for token in parseDep:                 
+            token= "%"+str(token)+"%"            
+            output = generateQueryOne(FROM_token,cols,token,subjectcode, sectionname,sectionperiod)
+            if output:
+                    return output 
+        output = generateQueryTwo(FROM_token,cols,subjectcode, sectionname,sectionperiod)
+        if output:
+            return output            
+                                     
 
 #method to find nouns, verbs ..
 def process_command(command):
