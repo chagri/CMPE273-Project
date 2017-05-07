@@ -109,32 +109,30 @@ def dependecyParse(command):
     #print command
     print "---dependency tree----"
     [to_nltk_tree(sent.root).pretty_print() for sent in parseDep.sents] 
-    for token in parseDep:  
-        list2.add(token)               
-        #print(token.orth_.encode('utf-8'), token.dep_.encode('utf-8'), token.head.orth_.encode('utf-8'), [t.orth_.encode('utf-8') for t in token.lefts], [t.orth_.encode('utf-8') for t in token.rights])                
-        #print token.orth_.encode('utf-8'),token.head.orth_.encode('utf-8')      
-        leaf= str(token.orth_.encode('utf-8'))
-        head=str(token.head.orth_.encode('utf-8'))
-        #call generateQuery module
-        searchCondition = "%"+leaf+"%""%"+head+"%"
-        if FROM_token:            
+    if FROM_token and '*' not in cols:
+        for token in parseDep:  
+            list2.add(token)               
+            #print(token.orth_.encode('utf-8'), token.dep_.encode('utf-8'), token.head.orth_.encode('utf-8'), [t.orth_.encode('utf-8') for t in token.lefts], [t.orth_.encode('utf-8') for t in token.rights])                
+            #print token.orth_.encode('utf-8'),token.head.orth_.encode('utf-8')      
+            leaf= str(token.orth_.encode('utf-8'))
+            head=str(token.head.orth_.encode('utf-8'))
+            #call generateQuery module
+            searchCondition = "%"+leaf+"%""%"+head+"%"                        
             output = generateQueryOne(FROM_token,cols,searchCondition,subjectcode, sectionname,sectionperiod )
             if output:
-                return output                                
-        searchCondition = "%"+head+"%""%"+leaf+"%"
-        if FROM_token:            
+                    return output                                
+            searchCondition = "%"+head+"%""%"+leaf+"%"        
             output = generateQueryOne(FROM_token,cols,searchCondition,subjectcode, sectionname,sectionperiod )
             if output:
-                return output
-    for token in parseDep:                 
-        token= "%"+str(token)+"%"
-        if FROM_token:
+                    return output
+        for token in parseDep:                 
+            token= "%"+str(token)+"%"            
             output = generateQueryOne(FROM_token,cols,token,subjectcode, sectionname,sectionperiod)
             if output:
-                return output 
-    output = generateQueryTwo(FROM_token,cols,subjectcode, sectionname,sectionperiod)
-    if output:
-        return output            
+                    return output 
+        output = generateQueryTwo(FROM_token,cols,subjectcode, sectionname,sectionperiod)
+        if output:
+            return output            
                                      
 
 #method to find nouns, verbs ..
