@@ -10,4 +10,4 @@ create table grading_policy (
 	final_term varchar(255) , 
 	grading_pattern varchar(255) 
 
-	);
+);
