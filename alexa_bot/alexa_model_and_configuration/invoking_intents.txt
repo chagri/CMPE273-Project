@@ -1,0 +1,29 @@
+YesIntent yes
+YesIntent sure
+YesIntent alright
+YesIntent ok
+YesIntent okay
+
+NoIntent no
+NoIntent go away
+NoIntent stop
+NoIntent bye
+
+SummaryIntent {Subject}
+SummaryIntent search for {Subject}
+SummaryIntent look up {Subject}
+SummaryIntent tell me about {Subject}
+SummaryIntent summarize {Subject}
+
+CourseScheduleIntent {CourseSchedule}
+
+CMPEIntroIntent {IntroDetails}
+
+BookIntent {SuggestedBooks}
+
+GradingIntent {WeightageDetails}
+
+KnowledgeIntent {CourseTopic}
+KnowledgeIntent tell me about {CourseTopic}
+KnowledgeIntent search for {CourseTopic}
+KnowledgeIntent summarize {CourseTopic}
