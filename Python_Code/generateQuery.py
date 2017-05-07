@@ -8,7 +8,7 @@ import datetime
 
 #Generate query 
 def generateQueryOne(fromTable,selectColumns,searchCondition,subjectcode, sectionname,sectionperiod):
-    subjectcode = int(filter(str.isdigit, str(subjectcode)))
+    #subjectcode = int(filter(str.isdigit, str(subjectcode)))
     allColumns = getAllColumns(fromTable)
     selectColumns = set(selectColumns)       
     whereColumns = eliminateSelectColumns(selectColumns,allColumns)       
@@ -20,7 +20,8 @@ def generateQueryOne(fromTable,selectColumns,searchCondition,subjectcode, sectio
         selectString = ', '.join(str(e) for e in selectColumns) 
         
     else:
-        selectString= ','.join(str(s) for s in selectColumns)         
+        selectString= ','.join(str(s) for s in selectColumns)   
+    print "selectColumns",selectColumns               
     for column in set(whereColumns):                 
         rows_affected = cursor.execute("SELECT %s from %s where %s like ('%s') and subject_code=trim('%s') and section_name=trim('%s') and section_period=trim('%s');"%(selectString,fromTable,column,searchCondition,subjectcode, sectionname,sectionperiod))                   
         data = cursor.fetchall()        
@@ -41,7 +42,7 @@ def generateQueryOne(fromTable,selectColumns,searchCondition,subjectcode, sectio
 
 
 def generateQueryTwo(fromTable,selectColumns,subjectcode, sectionname,sectionperiod):
-    subjectcode = int(filter(str.isdigit, str(subjectcode)))
+    #subjectcode = int(filter(str.isdigit, str(subjectcode)))
     allColumns = getAllColumns(fromTable)
     selectColumns = set(selectColumns)                
     db = MySQLdb.connect("localhost","root","Apple@123","testdb" )
@@ -52,8 +53,7 @@ def generateQueryTwo(fromTable,selectColumns,subjectcode, sectionname,sectionper
         selectString = ', '.join(str(e) for e in selectColumns) 
         
     else:
-        selectString= ','.join(str(s) for s in selectColumns)        
-    print "selectString",selectString                 
+        selectString= ','.join(str(s) for s in selectColumns)                      
     rows_affected = cursor.execute("SELECT %s from %s where subject_code=trim('%s') and section_name=trim('%s') and section_period=trim('%s');"%(selectString,fromTable,subjectcode, sectionname,sectionperiod))                   
     data = cursor.fetchall()        
     if rows_affected >1:                                  
