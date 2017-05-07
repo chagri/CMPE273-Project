@@ -20,11 +20,8 @@ def generateQueryOne(fromTable,selectColumns,searchCondition,subjectcode, sectio
         selectString = ', '.join(str(e) for e in selectColumns) 
         
     else:
-        selectString= ','.join(str(s) for s in selectColumns)    
-    print "searchCondition",searchCondition 
-    print "selectString",selectString       
-    for column in set(whereColumns):  
-        print "column",column          
+        selectString= ','.join(str(s) for s in selectColumns)         
+    for column in set(whereColumns):                 
         rows_affected = cursor.execute("SELECT %s from %s where %s like ('%s') and subject_code=trim('%s') and section_name=trim('%s') and section_period=trim('%s');"%(selectString,fromTable,column,searchCondition,subjectcode, sectionname,sectionperiod))                   
         data = cursor.fetchall()        
         if rows_affected >1:                                  
