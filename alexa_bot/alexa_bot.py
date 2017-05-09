@@ -40,6 +40,13 @@ def intro_intent(IntroDetails):
     output = get_intro_response(IntroDetails)
     return question(output)
 
+@ask.intent('GradingIntent')
+def grading_intent(WeightageDetails):
+    print ('GradingIntent')
+    phrase = WeightageDetails
+    output = get_grading_intent_response(phrase)
+    return question(output)    
+
 if __name__ == "__main__":
     app.run(debug=True)
 
