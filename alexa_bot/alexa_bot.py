@@ -47,6 +47,14 @@ def grading_intent(WeightageDetails):
     output = get_grading_intent_response(phrase)
     return question(output)    
 
+@ask.intent('BookIntent')
+def grading_intent(SuggestedBooks):
+    print ('BookIntent')
+    phrase = SuggestedBooks
+    output = get_book_intent(phrase)
+    return question(output)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 
