@@ -24,7 +24,7 @@ def readFromFile(filePath, category):
                 tableDict[name] = (parts[0:])                
             elif (category == "columns"):
                 #columnDict[parts[0]] = (parts[1:])
-                columnDict[name] = (parts[1:])
+                columnDict[name] = (parts[0:])
     except IOError:
         print "Could not read file:", filePath
 
