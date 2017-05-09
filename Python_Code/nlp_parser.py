@@ -5,7 +5,7 @@ from nltk.corpus import stopwords
 from file_reader import *
 from generateQuery import *
 from datetime import datetime
-import parsedatetime as pdt # $ pip install parsedatetime
+import parsedatetime as pdt 
 
 cal = pdt.Calendar()
 
@@ -39,14 +39,17 @@ def nlp_parseInput(command):
         return None
 
     primaryKey = command.split(' ')
+    
     subjectcode = primaryKey[0]
     sectionname = primaryKey[1]
-    sectionperiod = primaryKey[2]
+    sectionperiod = primaryKey[2].rstrip(',')
+    #print sectionperiod
+   
 
     occur = 3  
     indices = [x.start() for x in re.finditer(" ", command)]    
     command = command[indices[occur-1]+1:]
-        
+           
     CMD = command   
     parsedEx = nlp(command.decode('utf-8'))
 
@@ -114,7 +117,7 @@ def findTableorCol(tokens_filtered,key):
                     return FROM_token
         if(fromTable == ''):
             for t in tokens_filtered:
-                print tokens_filtered
+                #print tokens_filtered
                 table_name = searchDictionary(tableDict,str(t))
                 #read columns only when we know the table            
                 if(table_name != None):                   
@@ -138,17 +141,15 @@ def findTableorCol(tokens_filtered,key):
                 if(col_name != None):
                     columnList.append(col_name.strip("['']"))
         #else search headleaf    
-        else:
-            hList= findLeafHead(toks,"headleaf")
-            for l in hList:
-                col_name = searchDictionary(columnDict,str(l))
-                if(col_name != None):
-                    columnList.append(col_name.strip("['']"))       
-        if(len(columnList) == 0):
-            for t in tokens:               
-                col_name = searchDictionary(columnDict,str(t))
-                if(col_name != None):
-                    columnList.append(col_name.strip("['']"))
+        hList= findLeafHead(toks,"headleaf")
+        for l in hList:
+            col_name = searchDictionary(columnDict,str(l))
+            if(col_name != None):
+                columnList.append(col_name.strip("['']"))       
+        for t in tokens:
+            col_name = searchDictionary(columnDict,str(t))
+            if(col_name != None):
+                columnList.append(col_name.strip("['']"))
         cols = columnList               
         return cols
 
@@ -165,13 +166,14 @@ def findLeafHead(command,key):
     for token in parseDep:
         leaf= str(token.orth_.encode('utf-8'))
         head=str(token.head.orth_.encode('utf-8')) 
+        print leaf,head
         if(key=="leafhead"):
             if(head==leaf):
                 leafList.append(leaf.strip())
             else:
                 leafList.append(leaf.strip() + "_" + head.strip())            
         elif(key == "headleaf"):
-            print "hleaf",head.strip() + "_"+leaf.strip()
+            #print "hleaf",head.strip() + "_"+leaf.strip()
             if(head==leaf):
                 headList.append(leaf.strip())
             else:
@@ -182,44 +184,77 @@ def findLeafHead(command,key):
         return headList
     else:
         return leafList
+
+def cleanText(leaf1):  
+  
+    CheckLIST = set(stopwords.words('english'))   
+    CheckLIST.add('?')    
+    #print CheckLIST
+    #print "three"
+    if leaf1 not in CheckLIST:
+        #print "token aftr: ", leaf1
+        return leaf1
+    else:       
+        return None
+        
+   
 #find dependency between words
 def dependecyParse(command):
     global dateValue
     parseDep = nlp(command.decode('utf-8'))
-    list1 = set()
-    list1.add('who')
-    list2 = set()
-
+  
+  
     print FROM_token
     print "---dependency tree----"
     [to_nltk_tree(sent.root).pretty_print() for sent in parseDep.sents] 
     if FROM_token and '*' not in cols:
         if dateValue:            
-            output = generateQueryOne(FROM_token,cols,dateValue,subjectcode, sectionname,sectionperiod)   
-            return output
-        for token in parseDep:  
-            list2.add(token)               
+            output = generateQueryOne(FROM_token,cols,dateValue,subjectcode, sectionname,sectionperiod)
+            if(output):
+                return output
+            else:
+                return "No results found"
+        for token in parseDep:           
+                        
             #print(token.orth_.encode('utf-8'), token.dep_.encode('utf-8'), token.head.orth_.encode('utf-8'), [t.orth_.encode('utf-8') for t in token.lefts], [t.orth_.encode('utf-8') for t in token.rights])                
             #print token.orth_.encode('utf-8'),token.head.orth_.encode('utf-8')      
             leaf= str(token.orth_.encode('utf-8'))
             head=str(token.head.orth_.encode('utf-8'))
             #call generateQuery module
-            searchCondition = "%"+leaf+"%""%"+head+"%"                        
-            output = generateQueryOne(FROM_token,cols,searchCondition,subjectcode, sectionname,sectionperiod )
-            if output:
+            #print "bef"
+            lf = cleanText(leaf)
+            #print "aft"
+            hd = cleanText(head)  
+            #print "aft2"        
+            if(lf and hd):
+                print "lf and hd:" ,lf,hd
+                searchCondition = "%"+lf+"%""%"+hd+"%"                        
+                output = generateQueryOne(FROM_token,cols,searchCondition,subjectcode, sectionname,sectionperiod )
+                if output:
                     return output                                
-            searchCondition = "%"+head+"%""%"+leaf+"%"        
-            output = generateQueryOne(FROM_token,cols,searchCondition,subjectcode, sectionname,sectionperiod )
-            if output:
+                searchCondition = "%"+hd+"%""%"+lf+"%"        
+                output = generateQueryOne(FROM_token,cols,searchCondition,subjectcode, sectionname,sectionperiod )
+                if output:
                     return output
-        for token in parseDep:                 
-            token= "%"+str(token)+"%"            
-            output = generateQueryOne(FROM_token,cols,token,subjectcode, sectionname,sectionperiod)
-            if output:
-                    return output 
+        for token in parseDep:
+            print "token"
+            tk= str(token.orth_.encode('utf-8'))  
+            tk = cleanText(tk)
+            print "orth: ",tk          
+           # print "tk: ",tk        
+            if(tk):
+                if(len(tk)>1):
+                    print "tk: ",tk      
+                    token= "%"+str(tk)+"%" 
+                    print "indiv token: ", token        
+                    output = generateQueryOne(FROM_token,cols,token,subjectcode, sectionname,sectionperiod)
+                    if output:
+                        return output 
         output = generateQueryTwo(FROM_token,cols,subjectcode, sectionname,sectionperiod)
-        if output:
-            return output            
+        if(output):
+            return output
+        else:
+            return "No results found"          
 #method to find nouns, verbs ..
 def process_command(command):
     #command = "who is the professor for CMPE273 for spring 2017?"
