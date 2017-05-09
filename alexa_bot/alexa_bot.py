@@ -19,7 +19,7 @@ def start_skill():
     welcome_message = "hello"
     return  question(welcome_message)
 
-    
+
 # when user wants to listen
 @ask.intent('YesIntent')
 def share_headlines():
@@ -33,6 +33,12 @@ def no_intent():
     exit_text  = get_no_response()
     return statement(exit_text)
 
+@ask.intent('CMPEIntroIntent')
+def intro_intent(IntroDetails):
+    print ('CMPEIntroIntent instructor_intent')
+    phrase = IntroDetails
+    output = get_intro_response(IntroDetails)
+    return question(output)
 
 if __name__ == "__main__":
     app.run(debug=True)
