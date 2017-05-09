@@ -19,6 +19,20 @@ def start_skill():
     welcome_message = "hello"
     return  question(welcome_message)
 
+    
+# when user wants to listen
+@ask.intent('YesIntent')
+def share_headlines():
+    yes_msg = get_yes_response()
+    return statement(yes_msg)
+
+
+# when user doesn't like and wants, we have a no intent:
+@ask.intent('NoIntent')
+def no_intent():
+    exit_text  = get_no_response()
+    return statement(exit_text)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
