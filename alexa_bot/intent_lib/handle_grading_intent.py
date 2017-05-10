@@ -1,3 +1,8 @@
+from nlp_lib.entity_extractor import extract_candidate_words
+
+def extract_intent(text):
+    entities = extract_candidate_words(text)
+    return entities[0]
 
 def get_grading_intent_response(phrase):
     if "quiz" in phrase or 'pop quiz' in phrase:
