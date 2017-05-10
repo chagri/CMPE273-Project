@@ -1,4 +1,8 @@
+from nlp_lib.entity_extractor import extract_candidate_words
 
+def extract_intent(text):
+    entities = extract_candidate_words(text)
+    return entities[0]
 
 def get_book_intent(phrase):
     if "recommended book" in phrase or 'recommended book for the course' in phrase or 'which book should I refer' in phrase:
