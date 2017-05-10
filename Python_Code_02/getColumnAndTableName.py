@@ -25,7 +25,7 @@ def getAllColumns(table):
 
 def getSetOfAllColumns():
     listOfColumnNames = getAllColumns("greensheet")
-    listOfColumnNames.update(getAllColumns("course_schedule"))
+    listOfColumnNames.update(getAllColumns("course_sch"))
     listOfColumnNames.update(getAllColumns("grading_policy"))
     return listOfColumnNames
 
@@ -105,7 +105,7 @@ def getColumnAndTableName(attributeList):
     if column_name == None:
         return None, None
     greensheetColumns = getAllColumns("greensheet")
-    courseScheduleColumns = getAllColumns("course_schedule")
+    courseScheduleColumns = getAllColumns("course_sch")
     gradingPolicyColumns = getAllColumns("grading_policy")
     if (column_name in greensheetColumns):
         table_name = "greensheet"
