@@ -10,7 +10,7 @@ def word2int (textnum, nwords={}):
 
         scales = ["hundred", "thousand", "million", "billion", "trillion"]
 
-        nwords["and"] = (1, 0)
+        #nwords["and"] = (1, 0)
         for idx, word in enumerate(units):  nwords[word] = (1, idx)
         for idx, word in enumerate(tens):       nwords[word] = (1, idx * 10)
         for idx, word in enumerate(scales): nwords[word] = (10 ** (idx * 3 or 2), 0)
@@ -55,4 +55,3 @@ def word2int (textnum, nwords={}):
         curstring += repr(result + current)
 
     return curstring
-
