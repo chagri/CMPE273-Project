@@ -8,31 +8,38 @@ from datetime import datetime
 from nltk import word_tokenize
 import parsedatetime as pdt # $ pip install parsedatetime
 from word2num import *
+from greenSheetResponse import *
 
 cal = pdt.Calendar()
 
 FROM_token = ''
 cols = list()
+
 CMD = ''
 nlp = spacy.load('en')
 subjectcode = ''
 sectionname = ''
 sectionperiod = ''
+inputCmd = ''
 resetFlag = 0
 outputHeader = ''
 
+
 def nlp_parseInput(command):
-    
+
  try:  
-    global CMD ,subjectcode ,sectionname, sectionperiod, dateValue,resetFlag,outputHeader
-    print "************command ",command         
+    global CMD ,subjectcode ,sectionname, sectionperiod, dateValue,resetFlag,outputHeader,inputCmd,prefix
+    print "************command ",command  
+    inputCmd = command    
     dateChk = command.encode('ascii','ignore')    
     dateValue = ''
-    if (str(cal.parseDT(dateChk)[0]) != datetime.now().strftime('%Y-%m-%d %H:%M:%S')):         
-        dateValue=str(cal.parseDT(dateChk)[0].date())        
+    # if (str(cal.parseDT(dateChk)[0]) != datetime.now().strftime('%Y-%m-%d %H:%M:%S')):         
+    #     dateValue=str(cal.parseDT(dateChk)[0].date())    
+    if (str(cal.parseDT(dateChk.strip('?'))[0]) != datetime.now().strftime('%Y-%m-%d %H:%M:%S')):         
+        dateValue=str(cal.parseDT(dateChk.strip('?'))[0].date())        
 
     print dateValue 
-    print dateChk
+    print "dateChk:", dateChk
     GREETLIST = ['hi','hello','hey','hi there','hey there','wassup','whatssup'] 
     if command in GREETLIST:
         response = "hello, try asking something from greesheet. For Example: cmpe273 section2 spring,2017 who is the instructor? and Type 'change' when you wish to change the course or term"
@@ -66,9 +73,12 @@ def nlp_parseInput(command):
             resetFlag = 1
         else: 
             return "Please provide the course details you wish to query for"
-    else if (command.startswith('cmpe')):
-                    
+    elif command.startswith('cmpe'):
+        occur = 3  
+        indices = [x.start() for x in re.finditer(" ", command)]    
+        command = command[indices[occur-1]+1:]    
 
+               
     command = word2int(command)
     print command
     CMD = command   
@@ -83,7 +93,6 @@ def nlp_parseInput(command):
     return None
 
 def removeStopWords(tokens):
-    print "removeStopWords"
     global FROM_token,CMD
     #strCmd = CMD.split(",")[0:]
     STOPLIST = set(stopwords.words('english'))
@@ -94,16 +103,15 @@ def removeStopWords(tokens):
     tokens_filtered = [tok for tok in tokens if tok not in STOPLIST]   
     FROM_token = findTableorCol(tokens_filtered,"table")
     #if no table found, do not search for cols
-    if(FROM_token != None):       
+    if(FROM_token):       
         cols = findTableorCol(CMD,"columns")
         if(len(cols) == 0):
             cols.append("*")
     #new sentence without stop words
     #new_sentence = ' '.join(tokens_filtered)       
     return dependecyParse(CMD)
-
+     
 def lemmatizeTokens(tokens):
-    print "lemmatizeTokens"
     lemmas = []
     for tok in tokens:
         lemmas.append(tok.lemma_.lower().strip() if tok.lemma_ != "-PRON-" else tok.lower_)
@@ -112,7 +120,6 @@ def lemmatizeTokens(tokens):
 
 #call file_reader module to find tablename & column name
 def findTableorCol(tokens_filtered,key):
-    print "findTableorCol"
     global cols,CMD
     fromTable =''
     columnList = list()   
@@ -181,15 +188,14 @@ def findTableorCol(tokens_filtered,key):
         cols = columnList               
         return cols
 
+
 def to_nltk_tree(node):
-    print "to_nltk_tree"
     if node.n_lefts + node.n_rights > 0:
         return Tree(node.orth_, [to_nltk_tree(child) for child in node.children])
     else:
         return node.orth_
 
 def findLeafHead(command,key):
-    print "findLeafHead"
     leafList = list()
     headList = list()
     parseDep = nlp(command.decode('utf-8'))
@@ -216,7 +222,7 @@ def findLeafHead(command,key):
         return leafList
 
 def cleanText(leaf1):  
-    print "cleanText"
+  
     CheckLIST = set(stopwords.words('english'))   
     CheckLIST.add('?')    
     #print CheckLIST
@@ -230,11 +236,10 @@ def cleanText(leaf1):
    
 #find dependency between words
 def dependecyParse(command):
-    print "dependecyParse"
     global dateValue
     parseDep = nlp(command.decode('utf-8'))
   
-  
+    #process_command(command)
     print FROM_token
     print "---dependency tree----"
     [to_nltk_tree(sent.root).pretty_print() for sent in parseDep.sents] 
@@ -281,14 +286,18 @@ def dependecyParse(command):
                     output = generateQueryOne(FROM_token,cols,token,subjectcode, sectionname,sectionperiod)
                     if output:
                         return output 
+        print "calling..."       
+        
         output = generateQueryTwo(FROM_token,cols,subjectcode, sectionname,sectionperiod)
         if(output):
             return output
         else:
-            return "No results found"          
+            return "No results found"    
+    else:
+        return DB_Response(inputCmd)
 #method to find nouns, verbs ..
 def process_command(command):
-    #command = "who is the professor for CMPE273 for spring 2017?"
+    command = "when is lab30 due?"
     tokens = nlp(command.decode('utf-8'))
     verbArr =[]
     nounArr = []
@@ -297,6 +306,7 @@ def process_command(command):
     AdverbArr = []
     #filter out nouns
     for np in tokens.noun_chunks:
+        
         nounArr.append(np)
         #filter out entities
         for ent in tokens.ents:
@@ -310,8 +320,11 @@ def process_command(command):
                     numArr.append(token)
                 elif "ADV" in token.pos_:
                     AdverbArr.append(token)
-    response = "Sure...write some more code then I can do that!"
+    print "verbs: " ,verbArr
+    print "nouns: " ,nounArr
+    print "adverbs: ",AdverbArr
+    #response = "Sure...write some more code then I can do that!"
     #else:
         #response = "I am CMPE bot. How can I help you? Use the *" + EXAMPLE_COMMAND + \
                       #"* command while asking questions."
-    return response
+    #return response
