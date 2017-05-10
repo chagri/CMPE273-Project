@@ -3,7 +3,7 @@ from SpellCheck import SpellCheckResponse
 import MySQLdb
 import enchant
 from checkGreensheetAttribute import checkSubjectCode
-
+import tanayTest
 
 d = enchant.Dict("en_US")
 nlp = spacy.load('en')
@@ -39,7 +39,8 @@ def DB_Response(command):
     checkGreensheet =  checkSubjectCode(mainAttributes)
     if checkGreensheet == False:
         return "Hello There I cannot find the GreenSheet you are seeking for try seaching for someother GreenSheet."
-
+    tempColoumn = tanayTest.getColumnName(responseAttributes,table)
+    print tempColoumn
 
     for word in responseAttributes:
            print  "Checking spell check response"
@@ -50,11 +51,11 @@ def DB_Response(command):
 
     if flag == 1:
         print "Finally got every thing All right"
-        query = "SELECT instructor FROM greensheet1  where subject_code=" + "'" + str(mainAttributes[0]) + "' and section_name =" + "'" + str(mainAttributes[1]) + "' and section_period=" + "'" + str(mainAttributes[2]) + "';"
-
+        query = "SELECT " + str(tempColoumn) + " FROM " + str(table) +" where subject_code=" + "'" + str(mainAttributes[0]) + "' and section_name =" + "'" + str(mainAttributes[1]) + "' and subject_term=" + "'" + str(mainAttributes[2]) + "';"
+        print query
         cur.execute(query)
         response = cur.fetchall()
-        return response
+        return str(response)
     else:
         print "Test from Hello"
         response = 'hey there, Try asking me something from your greesheet For Example: cmpe273 section2 spring,2017, who is the instructor?'
