@@ -3,7 +3,6 @@ import MySQLdb
 
 
 def getAllColumns(table):
-    table = "greensheet"
     allColumns = set()
     # global allColumns
     db = MySQLdb.connect(host="127.0.0.1",  # your host, usually localhost
@@ -110,7 +109,7 @@ def getColumnAndTableName(attributeList):
     if (column_name in greensheetColumns):
         table_name = "greensheet"
     elif (column_name in courseScheduleColumns):
-        table_name = "course_schedule"
+        table_name = "course_sch"
     elif (column_name in gradingPolicyColumns):
         table_name = "grading_policy"
     else:
