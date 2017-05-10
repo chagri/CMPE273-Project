@@ -1,1 +1,6 @@
 
+nltk
+spacy
+parsedatetime
+PyDictionary
+PyEnchant
