@@ -39,7 +39,7 @@ def DB_Response(command):
     checkGreensheet =  checkSubjectCode(mainAttributes)
     if checkGreensheet == False:
         return "Hello There I cannot find the GreenSheet you are seeking for try seaching for someother GreenSheet."
-    tempColoumn = tanayTest.getColumnName(responseAttributes,table)
+    tempColoumn,table = tanayTest.getColumnName(responseAttributes)
     print tempColoumn
 
     for word in responseAttributes:
