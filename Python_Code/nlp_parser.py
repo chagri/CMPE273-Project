@@ -7,6 +7,7 @@ from generateQuery import *
 from datetime import datetime
 from nltk import word_tokenize
 import parsedatetime as pdt # $ pip install parsedatetime
+from word2num import *
 
 cal = pdt.Calendar()
 
@@ -33,7 +34,7 @@ def nlp_parseInput(command):
 
     GREETLIST = ['hi','hello','hey','hi there','hey there','wassup','whatssup'] 
     if command in GREETLIST:
-        response = "hello, try asking something from greesheet. For Example: cmpe273 section2 spring2017 who is the instructor?"
+        response = "hello, try asking something from greesheet. For Example: cmpe273 section2 spring,2017` who is the instructor?"
         return response    
               
     if len(command.strip().split()) <= 1:
@@ -50,7 +51,9 @@ def nlp_parseInput(command):
     occur = 3  
     indices = [x.start() for x in re.finditer(" ", command)]    
     command = command[indices[occur-1]+1:]
-           
+    
+    command = word2int(command)
+    print command
     CMD = command   
     parsedEx = nlp(command.decode('utf-8'))
 
