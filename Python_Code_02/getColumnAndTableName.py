@@ -1,6 +1,6 @@
 from PyDictionary import PyDictionary
 import MySQLdb
-
+from pattern.en import pluralize, singularize
 
 def getAllColumns(table):
     allColumns = set()
@@ -46,6 +46,10 @@ def getCorrectAttribute(attributeToCheck,columnSynonymDict):
 
  if(attributeToCheck in listOfColumnNames):
      return attributeToCheck
+ elif(pluralize(attributeToCheck) in listOfColumnNames):
+     return pluralize(attributeToCheck)
+ elif (singularize(attributeToCheck) in listOfColumnNames):
+     return singularize(attributeToCheck)
 
  for key, value in columnSynonymDict.iteritems():
 
