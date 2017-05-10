@@ -72,6 +72,26 @@ def grading_intent(SuggestedBooks):
     output = get_book_intent(phrase)
     return question(output)
 
+@ask.intent('CourseScheduleIntent')
+def course_intent(CourseSchedule):
+    print ("CourseScheduleIntent")
+    phrase = CourseSchedule
+    output = get_course_schedule_intent(phrase)
+    return question(output)
+
+
+@ask.intent('KnowledgeIntent')
+def instructor_intent(CourseTopic):
+    out_sum = get_summary(CourseTopic)
+    return question('Here is the summary for {}'.format(CourseTopic) + out_sum)
+
+
+@ask.intent('SummaryIntent')
+def input_intent(Subject):
+    out_sum = get_summary(Subject)
+    return question('Here is the summary for {}'.format(Subject) + out_sum)
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
