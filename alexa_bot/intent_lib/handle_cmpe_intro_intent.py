@@ -1,4 +1,4 @@
-"""
+
 from nlp_lib.entity_extractor import extract_candidate_words
 from resources.get_config_map import get_config_map
 
@@ -7,11 +7,9 @@ def extract_intent(text):
     entities = extract_candidate_words(text)
     return entities[0]
 
-"""
 
 def get_intro_response(phrase):
-    """
-    print "test: ", phrase
+
     extracted_intent = extract_intent(phrase)
     print "extracted intent: ", extracted_intent
 
@@ -21,10 +19,6 @@ def get_intro_response(phrase):
         return config_map[key_to_intent_map[extracted_intent]]
 
     elif "title" in phrase or "course name" in phrase or "name of the course" in phrase:
-
-    """
-
-    if "title" in phrase or "course name" in phrase or "name of the course" in phrase:
         output = "The title of the course is Enterprise Distributed Systems. Would you like to ask something else?"
         return output
 
