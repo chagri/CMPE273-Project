@@ -18,52 +18,72 @@ nlp = spacy.load('en')
 subjectcode = ''
 sectionname = ''
 sectionperiod = ''
+resetFlag = 0
+outputHeader = ''
 
 def nlp_parseInput(command):
     
  try:  
-    global CMD ,subjectcode ,sectionname, sectionperiod, dateValue
-    print "************command ",command     
-    
+    global CMD ,subjectcode ,sectionname, sectionperiod, dateValue,resetFlag,outputHeader
+    print "************command ",command         
     dateChk = command.encode('ascii','ignore')    
     dateValue = ''
     if (str(cal.parseDT(dateChk)[0]) != datetime.now().strftime('%Y-%m-%d %H:%M:%S')):         
         dateValue=str(cal.parseDT(dateChk)[0].date())        
 
     print dateValue 
-
+    print dateChk
     GREETLIST = ['hi','hello','hey','hi there','hey there','wassup','whatssup'] 
     if command in GREETLIST:
-        response = "hello, try asking something from greesheet. For Example: cmpe273 section2 spring,2017` who is the instructor?"
-        return response    
-              
+        response = "hello, try asking something from greesheet. For Example: cmpe273 section2 spring,2017 who is the instructor? and Type 'change' when you wish to change the course or term"
+        return response       
+
     if len(command.strip().split()) <= 1:
-        return None
+        print "inside single token",dateChk
+        print type(dateChk)
+        if dateChk.strip() == 'change':
+            print "inside change"
+            resetFlag = 0  
+            outputHeader=''
+            print "outputHeader",outputHeader
+            return "Resetting the course details. Submit your next query with the course details.For Example: cmpe273 section2 spring,2017, who is the instructor? and Type 'change' when you wish to change the course or term"
+        else:    
+            print 'else block'
+            return None
+  
+    if resetFlag == 0:
+        primaryKey = command.split(' ')        
+        subjectcode = primaryKey[0]
+        sectionname = primaryKey[1]
+        sectionperiod = primaryKey[2].rstrip(',')
+        if subjectcode.startswith('cmpe') and sectionname.startswith('section'):                
+            #print sectionperiod
+            outputHeader = "**%s**%s**%s**"%(subjectcode,sectionname,sectionperiod)
+            print outputHeader
+            occur = 3  
+            indices = [x.start() for x in re.finditer(" ", command)]    
+            command = command[indices[occur-1]+1:]
+            resetFlag = 1
+        else: 
+            return "Please provide the course details you wish to query for"
+    else if (command.startswith('cmpe')):
+                    
 
-    primaryKey = command.split(' ')
-    
-    subjectcode = primaryKey[0]
-    sectionname = primaryKey[1]
-    sectionperiod = primaryKey[2].rstrip(',')
-    #print sectionperiod
-   
-
-    occur = 3  
-    indices = [x.start() for x in re.finditer(" ", command)]    
-    command = command[indices[occur-1]+1:]
-    
     command = word2int(command)
     print command
     CMD = command   
+    print CMD
     parsedEx = nlp(command.decode('utf-8'))
-
+    print parsedEx
     tokens = lemmatizeTokens(parsedEx)    
-    return removeStopWords(tokens)
+    print "tokens",tokens
+    return "%s\n%s"%(outputHeader,removeStopWords(tokens))
     
  except:
     return None
 
 def removeStopWords(tokens):
+    print "removeStopWords"
     global FROM_token,CMD
     #strCmd = CMD.split(",")[0:]
     STOPLIST = set(stopwords.words('english'))
@@ -83,6 +103,7 @@ def removeStopWords(tokens):
     return dependecyParse(CMD)
 
 def lemmatizeTokens(tokens):
+    print "lemmatizeTokens"
     lemmas = []
     for tok in tokens:
         lemmas.append(tok.lemma_.lower().strip() if tok.lemma_ != "-PRON-" else tok.lower_)
@@ -91,6 +112,7 @@ def lemmatizeTokens(tokens):
 
 #call file_reader module to find tablename & column name
 def findTableorCol(tokens_filtered,key):
+    print "findTableorCol"
     global cols,CMD
     fromTable =''
     columnList = list()   
@@ -160,12 +182,14 @@ def findTableorCol(tokens_filtered,key):
         return cols
 
 def to_nltk_tree(node):
+    print "to_nltk_tree"
     if node.n_lefts + node.n_rights > 0:
         return Tree(node.orth_, [to_nltk_tree(child) for child in node.children])
     else:
         return node.orth_
 
 def findLeafHead(command,key):
+    print "findLeafHead"
     leafList = list()
     headList = list()
     parseDep = nlp(command.decode('utf-8'))
@@ -192,7 +216,7 @@ def findLeafHead(command,key):
         return leafList
 
 def cleanText(leaf1):  
-  
+    print "cleanText"
     CheckLIST = set(stopwords.words('english'))   
     CheckLIST.add('?')    
     #print CheckLIST
@@ -206,6 +230,7 @@ def cleanText(leaf1):
    
 #find dependency between words
 def dependecyParse(command):
+    print "dependecyParse"
     global dateValue
     parseDep = nlp(command.decode('utf-8'))
   
