@@ -18,33 +18,42 @@ def getAllColumns(table):
         allColumns.add(field[0])
     cursor.close()
     db.close()
-
     return allColumns
 
-
 def getSetOfAllColumns():
-    listOfColumnNames = getAllColumns("greensheet")
-    listOfColumnNames.update(getAllColumns("course_sch"))
-    listOfColumnNames.update(getAllColumns("grading_policy"))
-    return listOfColumnNames
+    db = MySQLdb.connect(host="127.0.0.1",  # your host, usually localhost
+                         user="greensheet",  # your username
+                         passwd="root1234",  # your password
+                         db="slackbot")  # name of the data base
+    cursor = db.cursor()
+    listOfCourseColumns = set()
+    sql = "SHOW tables"
+    cursor.execute(sql)
+    fields = cursor.fetchall()
+    counter = 0
+    for field in fields:
+        print str(field).replace("(","").replace(")","").replace("'","").replace(",","")
+        listOfCourseColumns.update(getAllColumns(str(field).replace("(","").replace(")","").replace("'","").replace(",","")))
+    cursor.close()
+    db.close()
+    return listOfCourseColumns
 
 
-def getCorrectAttribute(attributeToCheck, columnSynonymDict):
-    attributeToCheck = attributeToCheck.replace(" ", "_").lower()
-    queryValue = None;
-    listOfColumnNames = getSetOfAllColumns()
+def getCorrectAttribute(attributeToCheck,columnSynonymDict):
+ attributeToCheck = attributeToCheck.replace(" ","_").lower()
+ queryValue = None;
+ listOfColumnNames = getSetOfAllColumns()
 
-    if (attributeToCheck in listOfColumnNames):
-        return attributeToCheck
+ if(attributeToCheck in listOfColumnNames):
+     return attributeToCheck
 
-    for key, value in columnSynonymDict.iteritems():
+ for key, value in columnSynonymDict.iteritems():
 
-        if attributeToCheck is not None and value is not None and attributeToCheck in value:
-            queryValue = key
-            break;
+     if attributeToCheck is not None and value is not None and attributeToCheck in value:
+        queryValue = key
+        break;
 
-    return queryValue
-
+ return queryValue
 
 def getAttributeFromJoinedList(attributeList):
     joinedAttribute = None
@@ -74,7 +83,6 @@ def getAttributeFromJoinedList(attributeList):
 
     return joinedAttribute
 
-
 def getColumnName(attributeList):
     attributeList = [str(i) for i in attributeList]
     columnToReturn = None;
@@ -87,22 +95,21 @@ def getColumnName(attributeList):
             columnSynonymDict[column] = dictionary.synonym(column)
 
     for attributeToCheck in attributeList:
-        columnToReturn = getCorrectAttribute(attributeToCheck, columnSynonymDict)
+        columnToReturn = getCorrectAttribute(attributeToCheck,columnSynonymDict)
         if (columnToReturn == None):
             continue
         else:
             return columnToReturn
-    if (columnToReturn == None):
+    if(columnToReturn == None):
         columnToReturn = getAttributeFromJoinedList(attributeList)
     return columnToReturn
-
 
 def getColumnAndTableName(attributeList):
     column_name = None
     table_name = None
     column_name = getColumnName(attributeList)
     if column_name == None:
-        return None, None
+        return None,None
     greensheetColumns = getAllColumns("greensheet")
     courseScheduleColumns = getAllColumns("course_sch")
     gradingPolicyColumns = getAllColumns("grading_policy")
@@ -114,4 +121,4 @@ def getColumnAndTableName(attributeList):
         table_name = "grading_policy"
     else:
         table_name = "greensheet"
-    return column_name, table_name
+    return column_name,table_name
