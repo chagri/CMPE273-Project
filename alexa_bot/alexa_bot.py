@@ -2,6 +2,18 @@ from flask import Flask
 from flask_ask import Ask, statement, question, session
 import logging
 
+from intent_lib.handle_yes_intent import get_yes_response
+from intent_lib.handle_no_intent import get_no_response
+from intent_lib.handle_cmpe_intro_intent import get_intro_response
+from intent_lib.handle_grading_intent import get_grading_intent_response
+from intent_lib.handle_book_intent import get_book_intent
+from intent_lib.handle_course_schedule_intent import get_course_schedule_intent
+from intent_lib.handle_help_intent import get_help_response
+from summarizer.get_summary import get_summary
+
+
+
+
 
 app = Flask(__name__)
 ask = Ask(app, '/summarizer')
@@ -32,6 +44,12 @@ def share_headlines():
 def no_intent():
     exit_text  = get_no_response()
     return statement(exit_text)
+
+@ask.intent('HelpIntent')
+def share_headlines():
+    help_msg = get_help_response()
+    return question(help_msg)
+
 
 @ask.intent('CMPEIntroIntent')
 def intro_intent(IntroDetails):
