@@ -1,4 +1,4 @@
-
+SlackClient
 nltk
 spacy
 parsedatetime
