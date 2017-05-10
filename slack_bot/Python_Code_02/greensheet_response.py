@@ -4,6 +4,9 @@ import MySQLdb
 import enchant
 from checkGreensheetAttribute import checkSubjectCode
 import getColumnandTableName
+from pattern.en import suggest
+
+
 
 d = enchant.Dict("en_US")
 nlp = spacy.load('en')
@@ -49,7 +52,10 @@ def DB_Response(command):
            print  "Checking spell check response"
            if SpellCheckResponse(word) == False:
             print "found an spelling error"
-            return "Hey I see There Is something wrong with the Spelling you provided. Do you mean" +  str(d.suggest(word)) + "  instead of "+ str(word)
+
+            temp = str(word)
+            tem_str=suggest(temp)
+            return "Hey I see There Is something wrong with the Spelling you provided. Do you mean " + str(tem_str)  + "  instead of "+ str(word)
 
 
 
@@ -68,5 +74,5 @@ def DB_Response(command):
         print "Test from Hello"
         response = 'Hello There there, Try asking me something from your greesheet For Example: cmpe273 section2 spring,2017, who is the instructor?'
         return response
-
+    cur.close()
     db.close()
