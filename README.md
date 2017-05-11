@@ -4,7 +4,7 @@ In this project, we have created two bots: Slack-bot and Alexa-bot for CMPE gree
 ## 1. Slack-bot:
 Slack-bot is designed to answer your questions. We have created the front end using PHP and MySQL. In the front-end we have created a form which takes in values for all the greensheets and enters into our database. Professors can create multiple greensheets for their respective subjects. Users can add specific questions related to these greensheets and we have created algorithms in python to efficiently query the database and fetch results for the same. 
 
-### Requirements
+#### Requirements
 1. SlackClient
 2. nltk
 3. spacy
