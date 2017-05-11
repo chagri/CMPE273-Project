@@ -22,4 +22,4 @@ Alexa-bot requires one of the Alexa enabled devices (Echo, dot, look, show etc.)
 2. NLTK
 3. SPACY
 4. wikipedia
-5. Alexa skill
+
