@@ -12,7 +12,7 @@ Slack-bot is designed to answer your questions. We have created the front end us
 5. PyDictionary
 6. PyEnchant
 7. Singular and Plural - Pattern
-8. Word SUggestion - Pattern
+8. Word Suggestion - Pattern
 
 ## 2. Alexa-bot:
 Alexa-bot requires one of the Alexa enabled devices (Echo, dot, look, show etc.) for running/using the Alexa-bot. Alexa-bot is a Flask based Python application. This bot is built for CMPE 273 green sheet. It provides much more functionalities apart from just being a bot for green sheet. Please refer to the presentation regarding the same.
